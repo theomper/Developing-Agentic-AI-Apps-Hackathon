@@ -60,7 +60,7 @@ All agents are derived from a common base class, AIAgent, which provides a consi
 | OpenAI ChatCompletion       | An agent that uses the OpenAI ChatCompletion service.               | No                                     | Yes                                   |
 | OpenAI Responses            | An agent that uses the OpenAI Responses service.                    | Yes                                    | Yes                                   |
 | OpenAI Assistants           | An agent that uses the OpenAI Assistants service.                   | Yes                                    | No                                    |
-| Any other ChatClient        | You can also use any other Microsoft.Extensions.AI.IChatClient implementation to create an agent. | Varies                                 | Varies                                |
+| Any other ChatClient        | Any class inheriting from BaseChatClient, like AzureOpenAIResponsesClient and AzureOpenAIChatCompletionClient | Varies                                 | Varies                                |
 
 ### Integration with Model Context Protocol (MCP)
 
@@ -121,6 +121,10 @@ from agent_framework.clients import AzureOpenAIResponsesClient
 from azure.ai.inference import AsyncAzureOpenAIClient
 import os
 
+# Consider storing secrets in an .env file and loading
+# them using python-dotenv and load_dotenv()
+# See https://pypi.org/project/python-dotenv/
+
 async def create_agent_with_tools():
     """Create an agent with the current time tool registered."""
 
@@ -131,7 +135,9 @@ async def create_agent_with_tools():
     )
 
     # Create the chat client
-    chat_client = AzureOpenAIResponsesClient(client=azure_openai_client, model="gpt-4o-mini")
+    # AZURE_OPENAI_MODEL should be the name of your model deployment on Microsoft Foundry/Azure OpenAI
+    # i.e. "gpt-4.1-mini"
+    chat_client = AzureOpenAIResponsesClient(client=azure_openai_client, model=os.getenv("AZURE_OPENAI_MODEL"))
 
     # Define the current time tool as a Function
     current_time_function = Function(
