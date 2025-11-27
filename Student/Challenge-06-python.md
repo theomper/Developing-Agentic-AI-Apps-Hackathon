@@ -108,7 +108,8 @@ def get_current_time_utc() -> str:
 current_time_function = Function(
     name="get_current_time_utc",
     description="Returns the current system time in UTC",
-    parameters=[],  # No parameters needed
+    parameters=[],
+    # handler expects FunctionResult type
     handler=lambda: FunctionResult(get_current_time_utc())
 )
 ```
@@ -117,8 +118,7 @@ current_time_function = Function(
 
 ```python
 from agent_framework import ChatAgent
-from agent_framework.clients import AzureOpenAIResponsesClient
-from azure.ai.inference import AsyncAzureOpenAIClient
+from agent_framework.azure import AzureOpenAIResponsesClient
 import os
 
 # Consider storing secrets in an .env file and loading
@@ -128,23 +128,23 @@ import os
 async def create_agent_with_tools():
     """Create an agent with the current time tool registered."""
 
-    # Initialize the Azure OpenAI client
-    azure_openai_client = AsyncAzureOpenAIClient(
-        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        credential=os.getenv("AZURE_OPENAI_API_KEY")
-    )
-
     # Create the chat client
-    # AZURE_OPENAI_MODEL should be the name of your model deployment on Microsoft Foundry/Azure OpenAI
-    # i.e. "gpt-4.1-mini"
-    chat_client = AzureOpenAIResponsesClient(client=azure_openai_client, model=os.getenv("AZURE_OPENAI_MODEL"))
+    # AZURE_OPENAI_DEPLOYMENT_NAME should be the name of your model deployment on Microsoft Foundry/Azure OpenAI
+    # i.e. "gpt-4o-mini"
+    chat_client = AzureOpenAIResponsesClient(
+        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION", "latest")
+    )
 
     # Define the current time tool as a Function
     current_time_function = Function(
         name="get_current_time_utc",
         description="Returns the current system time in UTC",
         parameters=[],
-        handler=get_current_time_utc
+        # handler expects FunctionResult type
+        handler=lambda: FunctionResult(get_current_time_utc())
     )
 
     # Create the agent with the tool registered
@@ -238,7 +238,7 @@ async def integrate_mcp_tools_with_agent(agent, mcp_session):
         async def tool_handler(tool=mcp_tool, session=mcp_session, **kwargs):
             """Wrapper to call MCP tool through the session."""
             result = await session.call_tool(tool.name, arguments=kwargs)
-            return result
+            return FunctionResult(result)
 
         function = Function(
             name=mcp_tool.name,
