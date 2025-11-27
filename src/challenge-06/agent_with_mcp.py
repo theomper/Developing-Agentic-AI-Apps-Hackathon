@@ -171,19 +171,19 @@ class MCPIntegratedAgent:
         # Uncomment and implement these tasks:
 
         # # TASK 1: Create time agent
-        # await self.create_time_agent_and_register_tools(
-        #     agent_name="TimeAgent",
-        #     instructions="You are a helpful assistant that can provide time information using the available tools."
-        # )
+        await self.create_time_agent_and_register_tools(
+            agent_name="TimeAgent",
+            instructions="You are a helpful assistant that can provide time information using the available tools."
+        )
 
         # # TASK 2: Create weather agent with MCP tools
-        # server_path = sys.argv[1] if len(sys.argv) > 1 else None
-        # if server_path:
-        #     await self.create_weather_agent_and_register_mcp_tools(
-        #         agent_name="WeatherAgent",
-        #         instructions="You are a helpful assistant that can provide weather information using the available tools.",
-        #         server_script_path=server_path
-        #     )
+        server_path = sys.argv[1] if len(sys.argv) > 1 else None
+        if server_path:
+            await self.create_weather_agent_and_register_mcp_tools(
+                agent_name="WeatherAgent",
+                instructions="You are a helpful assistant that can provide weather information using the available tools.",
+                server_script_path=server_path
+            )
 
 
         print("=" * 60)
