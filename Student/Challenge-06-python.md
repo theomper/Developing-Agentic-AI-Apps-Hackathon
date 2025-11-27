@@ -125,6 +125,8 @@ def get_current_time_utc() -> str:
 >
 > class TimeArgs(BaseModel):
 >     timezone: Annotated[str, Field(description="The timezone name")]
+>     # Tip: You can just use 'pass' here for functions with no arguments.
+>     # input_model is a required parameter in AIFunction.
 >
 > time_function = AIFunction(
 >     name="get_time_for_timezone",
@@ -257,32 +259,6 @@ async def get_agent_from_service():
 
 In this task you will integrate the Weather MCP Remote server completed in the previous challenge and add it as tools in Microsoft Agent Framework.
 
-Initialize the MCP client with the following code:
-
-```python
-from mcp import ClientSession
-from mcp.client.sse import SseClientTransport
-import os
-import asyncio
-
-async def create_mcp_client():
-    """Create and connect to an MCP server via SSE transport."""
-
-    # Define the MCP server endpoint
-    mcp_server_url = os.getenv("MCP_SERVER_URL", "http://localhost:8000")
-
-    # Create SSE transport for HTTP-based connection
-    transport = SseClientTransport(mcp_server_url)
-
-    # Create MCP client session
-    async with ClientSession(transport) as session:
-        # Initialize the connection
-        await session.initialize()
-
-        return session
-```
-
-After creating the MCP client, you will get the list of tools and add them to Microsoft Agent Framework:
 
 ```python
 from agent_framework import MCPStdioTool
